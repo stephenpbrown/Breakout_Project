@@ -43,7 +43,7 @@ import jig.Vector;
 		removeImage(ResourceManager.getImage(BounceGame.BALL_BALLIMG_RSC));
 		addImageWithBoundingBox(ResourceManager
 				.getImage(BounceGame.BALL_BROKENIMG_RSC)); 
-		countdown = 500;
+		countdown = 500; // Milliseconds
 		velocity = velocity.bounce(surfaceTangent);
 	}
 

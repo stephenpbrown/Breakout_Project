@@ -18,7 +18,7 @@ import jig.Vector;
 	public Ball(final float x, final float y, final float vx, final float vy) {
 		super(x, y);
 		addImageWithBoundingBox(ResourceManager
-				.getImage(BounceGame.BALL_BALLIMG_RSC));
+				.getImage(BounceGame.BALL_BALLIMG_RSC)); // LOAD IMAGE BEFORE YOU GET TO CONSTRUCTOR
 		velocity = new Vector(vx, vy);
 		countdown = 0;
 	}
@@ -42,8 +42,8 @@ import jig.Vector;
 	public void bounce(float surfaceTangent) {
 		removeImage(ResourceManager.getImage(BounceGame.BALL_BALLIMG_RSC));
 		addImageWithBoundingBox(ResourceManager
-				.getImage(BounceGame.BALL_BROKENIMG_RSC));
-		countdown = 500;
+				.getImage(BounceGame.BALL_BROKENIMG_RSC)); 
+		countdown = 500; // Milliseconds
 		velocity = velocity.bounce(surfaceTangent);
 	}
 
@@ -54,7 +54,7 @@ import jig.Vector;
 	 *            the number of milliseconds since the last update
 	 */
 	public void update(final int delta) {
-		translate(velocity.scale(delta));
+		translate(velocity.scale(delta)); // SCALING HERE IS VERY IMPORTANT
 		if (countdown > 0) {
 			countdown -= delta;
 			if (countdown <= 0) {

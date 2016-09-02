@@ -57,7 +57,7 @@ public class BounceGame extends StateBasedGame {
 	public final int ScreenHeight;
 
 	Ball ball;
-	ArrayList<Bang> explosions;
+	ArrayList<Bang> explosions; // MAKE SURE THIS IS CLEARED PERIODICALLY
 
 	/**
 	 * Create the BounceGame frame, saving the width and height for later use.

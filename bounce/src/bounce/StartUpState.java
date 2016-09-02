@@ -57,7 +57,7 @@ class StartUpState extends BasicGameState {
 		if (input.isKeyDown(Input.KEY_SPACE))
 			bg.enterState(BounceGame.PLAYINGSTATE);	
 		
-		// bounce the ball...
+		// bounce the ball... HERE'S WHERE THE BALL GETS STUCK
 		boolean bounced = false;
 		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth
 				|| bg.ball.getCoarseGrainedMinX() < 0) {
@@ -74,6 +74,8 @@ class StartUpState extends BasicGameState {
 		bg.ball.update(delta);
 
 		// check if there are any finished explosions, if so remove them
+		// CAREFUL WITH GETTING CONCURRENT MODIFYING EXCEPTION HERE
+		// HAPPENS WHEN YOU MODIFY THE LIST WHILE YOU'RE TRYING TO WALK IT
 		for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {
 			if (!i.next().isActive()) {
 				i.remove();

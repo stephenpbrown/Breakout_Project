@@ -89,7 +89,7 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
-		if (bounces >= 10) {
+		if (bounces >= 20) {
 			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}

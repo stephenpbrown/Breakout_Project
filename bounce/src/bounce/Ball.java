@@ -22,11 +22,11 @@ import jig.Vector;
 		velocity = new Vector(vx, vy);
 		countdown = 0;
 	}
-
+	
 	public void setVelocity(final Vector v) {
 		velocity = v;
 	}
-
+	
 	public Vector getVelocity() {
 		return velocity;
 	}

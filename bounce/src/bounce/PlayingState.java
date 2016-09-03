@@ -81,8 +81,35 @@ class PlayingState extends BasicGameState {
 		}	
 		bg.paddle.update(delta);
 		
-		// bounce the ball
+		// Bounce off the paddle
 		boolean bounced = false;
+		boolean redrawBall = false;
+//		if(bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
+//			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX()
+//			&& bg.ball.getVelocity().getY() > 0)
+//		{
+//			System.out.println("Here");
+//			bg.ball.bounce(0);
+//			bounced = true;
+//		}
+//		else if(bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
+//			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
+//			&& bg.ball.getVelocity().getY() > 0)
+//		{
+//			System.out.println("There");
+//			bg.ball.bounce(0);
+//			bounced = true;
+//		}
+		if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
+			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
+			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX())
+		{
+			bg.ball.bounce(0);
+			bounced = true;
+			bounces++;
+		}
+		
+		// bounce the ball
 		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth && bg.ball.getVelocity().getX() > 0) // Right horizontal check
 		{
 			bg.ball.bounce(90);
@@ -93,11 +120,13 @@ class PlayingState extends BasicGameState {
 			bg.ball.bounce(90);
 			bounced = true;
 		}
-		else if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight && bg.ball.getVelocity().getY() > 0) // Bottom vertical check
+		else if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY() && bg.ball.getVelocity().getY() > 0) // Bottom vertical check
 		{
-			bg.ball.bounce(0);
+			bg.ball.setPosition(new Vector(bg.ball.getX(), bg.ball.getY()+20));
+			//bg.ball.bounce(0);
 			bounced = true;
 			livesRemaining--;
+			redrawBall = true;
 		}
 		else if (bg.ball.getCoarseGrainedMinY() < 0 && bg.ball.getVelocity().getY() < 0) // Top vertical check
 		{
@@ -105,18 +134,15 @@ class PlayingState extends BasicGameState {
 			bounced = true;
 		}
 		
-		// Bounce off the paddle
-		if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
-			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
-			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX())
-		{
-			bg.ball.bounce(0);
-			bounced = true;
-			bounces++;
-		}
 		if (bounced) {
 			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
 			//bounces++;
+		}
+		
+		if (redrawBall)
+		{
+			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 4);
+			bg.ball.setVelocity(new Vector(.1f, .2f));
 		}
 		
 		bg.ball.update(delta);

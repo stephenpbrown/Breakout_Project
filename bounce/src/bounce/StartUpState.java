@@ -3,6 +3,7 @@ package bounce;
 import java.util.Iterator;
 
 import jig.ResourceManager;
+import jig.Vector;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -59,8 +60,12 @@ class StartUpState extends BasicGameState {
 		BounceGame bg = (BounceGame)game;
 
 		if (input.isKeyDown(Input.KEY_SPACE))
+		{
+			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 4);
+			bg.ball.setVelocity(new Vector(.1f, .2f));
 			bg.enterState(BounceGame.PLAYINGSTATE);	
-		
+		}
+			
 		// ScreenWidth = 800, ScreenHeight = 800
 		// bounce the ball...
 		boolean bounced = false;

@@ -24,6 +24,7 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 class PlayingState extends BasicGameState {
 	int bounces;
+	int livesRemaining;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -33,6 +34,7 @@ class PlayingState extends BasicGameState {
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
 		bounces = 0;
+		livesRemaining = 3;
 		container.setSoundOn(true);
 	}
 	@Override
@@ -44,6 +46,8 @@ class PlayingState extends BasicGameState {
 		bg.paddle.render(g); // Draw the paddle
 		
 		g.drawString("Bounces: " + bounces, 10, 30);
+		g.drawString("Lives Remaining: " + livesRemaining, 10, 50);
+		
 		for (Bang b : bg.explosions)
 			b.render(g);
 	}
@@ -89,12 +93,13 @@ class PlayingState extends BasicGameState {
 			bg.ball.bounce(90);
 			bounced = true;
 		}
-		else if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight && bg.ball.getVelocity().getY() > 0) // Top vertical check
+		else if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight && bg.ball.getVelocity().getY() > 0) // Bottom vertical check
 		{
 			bg.ball.bounce(0);
 			bounced = true;
+			livesRemaining--;
 		}
-		else if (bg.ball.getCoarseGrainedMinY() < 0 && bg.ball.getVelocity().getY() < 0) // Bottom vertical check
+		else if (bg.ball.getCoarseGrainedMinY() < 0 && bg.ball.getVelocity().getY() < 0) // Top vertical check
 		{
 			bg.ball.bounce(0);
 			bounced = true;
@@ -107,10 +112,11 @@ class PlayingState extends BasicGameState {
 		{
 			bg.ball.bounce(0);
 			bounced = true;
+			bounces++;
 		}
 		if (bounced) {
 			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
-			bounces++;
+			//bounces++;
 		}
 		
 		bg.ball.update(delta);
@@ -122,7 +128,7 @@ class PlayingState extends BasicGameState {
 			}
 		}
 
-		if (bounces >= 10) {
+		if (livesRemaining == 0) {
 			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
 			game.enterState(BounceGame.GAMEOVERSTATE);
 		}

@@ -40,7 +40,9 @@ class PlayingState extends BasicGameState {
 			Graphics g) throws SlickException {
 		BounceGame bg = (BounceGame)game;
 		
-		bg.ball.render(g);
+		bg.ball.render(g); // Draw the ball
+		bg.paddle.render(g); // Draw the paddle
+		
 		g.drawString("Bounces: " + bounces, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
@@ -53,19 +55,29 @@ class PlayingState extends BasicGameState {
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
 		
-		if (input.isKeyDown(Input.KEY_W)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, -.001f)));
+//		if (input.isKeyDown(Input.KEY_W)) {
+//			bg.paddle.setVelocity(bg.paddle.getVelocity().add(new Vector(0f, -.001f)));
+//		}
+//		if (input.isKeyDown(Input.KEY_S)) {
+//			bg.paddle.setVelocity(bg.paddle.getVelocity().add(new Vector(0f, +.001f)));
+//		}
+		// Move the paddle left
+		if (input.isKeyDown(Input.KEY_LEFT) && !(bg.paddle.getCoarseGrainedMinX() < 0)) 
+		{
+			bg.paddle.setVelocity(new Vector(-0.5f,0));
 		}
-		if (input.isKeyDown(Input.KEY_S)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(0f, +.001f)));
+		// Move the paddle right
+		else if (input.isKeyDown(Input.KEY_RIGHT) && !(bg.paddle.getCoarseGrainedMaxX() > bg.ScreenWidth)) 
+		{
+			bg.paddle.setVelocity(new Vector(0.5f, 0));
 		}
-		if (input.isKeyDown(Input.KEY_A)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(-.001f, 0)));
-		}
-		if (input.isKeyDown(Input.KEY_D)) {
-			bg.ball.setVelocity(bg.ball.getVelocity().add(new Vector(+.001f, 0f)));
-		}
-		// bounce the ball...
+		else
+		{
+			bg.paddle.setVelocity(new Vector(0,0));
+		}	
+		bg.paddle.update(delta);
+		
+		// bounce the ball
 		boolean bounced = false;
 		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth && bg.ball.getVelocity().getX() > 0) // Right horizontal check
 		{
@@ -87,10 +99,20 @@ class PlayingState extends BasicGameState {
 			bg.ball.bounce(0);
 			bounced = true;
 		}
+		
+		// Bounce off the paddle
+		if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
+			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
+			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX())
+		{
+			bg.ball.bounce(0);
+			bounced = true;
+		}
 		if (bounced) {
 			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
 			bounces++;
 		}
+		
 		bg.ball.update(delta);
 
 		// check if there are any finished explosions, if so remove them

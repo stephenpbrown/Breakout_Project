@@ -39,7 +39,9 @@ class StartUpState extends BasicGameState {
 			Graphics g) throws SlickException {
 		BounceGame bg = (BounceGame)game;
 		
-		bg.ball.render(g);
+		bg.ball.render(g); // Draw ball
+		bg.paddle.render(g); // Draw paddle
+		
 		g.drawString("Bounces: ?", 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
@@ -80,6 +82,16 @@ class StartUpState extends BasicGameState {
 			bg.ball.bounce(0);
 			bounced = true;
 		}
+		
+		// Bounce off the paddle
+		if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
+			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
+			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX())
+		{
+			bg.ball.bounce(0);
+			bounced = true;
+		}
+		
 		if (bounced) {
 			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
 		}

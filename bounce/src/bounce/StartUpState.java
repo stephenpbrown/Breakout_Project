@@ -66,7 +66,6 @@ class StartUpState extends BasicGameState {
 			bg.enterState(BounceGame.PLAYINGSTATE);	
 		}
 			
-		// ScreenWidth = 800, ScreenHeight = 800
 		// bounce the ball...
 		boolean bounced = false;
 		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth && bg.ball.getVelocity().getX() > 0) // Right horizontal check

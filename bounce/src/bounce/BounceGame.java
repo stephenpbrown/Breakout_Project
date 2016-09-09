@@ -63,7 +63,9 @@ public class BounceGame extends StateBasedGame {
 
 	Ball ball;
 	Paddle paddle;
+	Bricks bricks;
 	ArrayList<Bang> explosions; // MAKE SURE THIS IS CLEARED PERIODICALLY
+	ArrayList<Bricks> brick;
 
 	/**
 	 * Create the BounceGame frame, saving the width and height for later use.
@@ -82,13 +84,13 @@ public class BounceGame extends StateBasedGame {
 
 		Entity.setCoarseGrainedCollisionBoundary(Entity.AABB);
 		explosions = new ArrayList<Bang>(10);
-				
+		brick = new ArrayList<Bricks>(25);
 	}
 
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
-		addState(new SplashScreenState());
+		//addState(new SplashScreenState());
 		addState(new StartUpState());
 		addState(new GameOverState());
 		addState(new PlayingState());
@@ -108,10 +110,10 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(STARTUP_BANNER_RSC);
 		ResourceManager.loadImage(BANG_EXPLOSIONIMG_RSC);
 		ResourceManager.loadImage(PADDLE_LEVEL_1_RSC);
-		//ResourceManager.loadImage(PADDLE_LEVEL_2_RSC);
-		//ResourceManager.loadImage(PADDLE_LEVEL_3_RSC);
+		ResourceManager.loadImage(PADDLE_LEVEL_2_RSC);
+		ResourceManager.loadImage(PADDLE_LEVEL_3_RSC);
 		
-		ball = new Ball(ScreenWidth / 4, ScreenHeight / 4, .1f, .2f);
+		ball = new Ball(ScreenWidth / 4, ScreenHeight / 2, .1f, .2f);
 		paddle = new Paddle(ScreenWidth / 2, ScreenHeight - 16);
 	}
 	

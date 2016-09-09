@@ -9,6 +9,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.EmptyTransition;
 import org.newdawn.slick.state.transition.HorizontalSplitTransition;
+import org.newdawn.slick.state.transition.VerticalSplitTransition;
 
 import jig.ResourceManager;
 
@@ -39,8 +40,8 @@ public class SplashScreenState extends BasicGameState
 		
 		//for (Bang b : bg.explosions)
 			//b.render(g);
-		g.drawImage(ResourceManager.getImage(BounceGame.SPLASH_SCREEN_RSC), 225,
-				270);
+		g.drawImage(ResourceManager.getImage(BounceGame.SPLASH_SCREEN_RSC), 185,
+				210);
 
 	}
 
@@ -51,7 +52,7 @@ public class SplashScreenState extends BasicGameState
 		
 		timer -= delta;
 		if (timer <= 0)
-			game.enterState(BounceGame.STARTUPSTATE, new EmptyTransition(), new HorizontalSplitTransition() );
+			game.enterState(BounceGame.STARTUPSTATE, new EmptyTransition(), new VerticalSplitTransition() );
 
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = ((BounceGame)game).explosions.iterator(); i.hasNext();) {

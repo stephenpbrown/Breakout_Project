@@ -11,10 +11,10 @@
 - **[9]** Correct the collision response for the ball.
 - **[10]** Create paddle that is controllable by the user.
 - **[11]** Create a "lives remaining" indicator and start at 3 lives. When lives remaining = 0, display game over.
+- **[12]** Create a "splash screen" with the name "Steve Brown".
 
 ## Open Issues ##
  
-- **[12]** Create a "splash screen" with the name "Steve Brown".
 - **[13]** Create bricks at the top of the screen that break (1 hit level 1, 2 hits level 2, etc...)
 - **[14]** Create a progression of 3 levels.
 - **[15]** Put cheat codes that allow the user to see/access features with a single key press.

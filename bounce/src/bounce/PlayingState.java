@@ -25,6 +25,10 @@ import org.newdawn.slick.state.StateBasedGame;
 class PlayingState extends BasicGameState {
 	int bounces;
 	int livesRemaining;
+	int bricksRemaining;
+	int level = 1;
+	boolean hitBrick;
+	Bricks lastBrickHit = null;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -36,6 +40,17 @@ class PlayingState extends BasicGameState {
 		bounces = 0;
 		livesRemaining = 3;
 		container.setSoundOn(true);
+		
+		BounceGame bg = (BounceGame)game;
+		
+		int numBricks = 8;
+		
+		// Add bricks
+		for (int i = 1; i < numBricks; i++)
+		{
+			bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight / 4));
+			bricksRemaining = i;
+		}
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
@@ -44,6 +59,12 @@ class PlayingState extends BasicGameState {
 		
 		bg.ball.render(g); // Draw the ball
 		bg.paddle.render(g); // Draw the paddle
+		
+		// Draw the bricks
+		for (Bricks b : bg.brick)
+		{
+			b.render(g);
+		}
 		
 		g.drawString("Bounces: " + bounces, 10, 30);
 		g.drawString("Lives Remaining: " + livesRemaining, 10, 50);
@@ -58,13 +79,7 @@ class PlayingState extends BasicGameState {
 
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
-		
-//		if (input.isKeyDown(Input.KEY_W)) {
-//			bg.paddle.setVelocity(bg.paddle.getVelocity().add(new Vector(0f, -.001f)));
-//		}
-//		if (input.isKeyDown(Input.KEY_S)) {
-//			bg.paddle.setVelocity(bg.paddle.getVelocity().add(new Vector(0f, +.001f)));
-//		}
+	
 		// Move the paddle left
 		if (input.isKeyDown(Input.KEY_LEFT) && !(bg.paddle.getCoarseGrainedMinX() < 0)) 
 		{
@@ -81,49 +96,137 @@ class PlayingState extends BasicGameState {
 		}	
 		bg.paddle.update(delta);
 		
-		// Bounce off the paddle
 		boolean bounced = false;
 		boolean redrawBall = false;
-//		if(bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
-//			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX()
-//			&& bg.ball.getVelocity().getY() > 0)
-//		{
-//			System.out.println("Here");
-//			bg.ball.bounce(0);
-//			bounced = true;
-//		}
-//		else if(bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
-//			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
-//			&& bg.ball.getVelocity().getY() > 0)
-//		{
-//			System.out.println("There");
-//			bg.ball.bounce(0);
-//			bounced = true;
-//		}
-		if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
-			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
-			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX())
+		// Bounce off the paddle
+		// Ball hits side of the paddle
+		if (bg.ball.collides(bg.paddle) != null && bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY() + 5)
+		{
+			bg.ball.bounce(90);
+			bg.ball.setVelocity(new Vector(1, 1));
+			bounced = true;
+			bounces++;
+		}
+		// Ball hits top of the paddle
+		else if (bg.ball.collides(bg.paddle) != null)
 		{
 			bg.ball.bounce(0);
 			bounced = true;
 			bounces++;
 		}
 		
+		Bricks refBrick = null;
+		if(bg.brick.get(0) != null)
+			refBrick = bg.brick.get(0);
+		
+		// Top right angle
+		double topRightdY = (refBrick.getCoarseGrainedMinY() - bg.ball.getCoarseGrainedHeight()/2)  - refBrick.getY();
+		double topRightdX  = (refBrick.getCoarseGrainedMaxX() + bg.ball.getCoarseGrainedWidth()/2) - refBrick.getX();
+		double topRightAngle = Math.atan2(topRightdY, topRightdX) * 180 / Math.PI;
+		topRightAngle = -topRightAngle;
+		
+		// Top left angle
+		double topLeftdY = topRightdY;
+		double topLeftdX = (refBrick.getCoarseGrainedMinX() - bg.ball.getCoarseGrainedWidth()/2) - refBrick.getX();
+		double topLeftAngle = Math.atan2(topLeftdY, topLeftdX) * 180 / Math.PI;
+		topLeftAngle = -topLeftAngle;
+		
+		// Bottom left angle
+		double bottomLeftdY = (refBrick.getCoarseGrainedMaxY() + bg.ball.getCoarseGrainedHeight()/2)  - refBrick.getY();
+		double bottomLeftdX = topLeftdX;
+		double bottomLeftAngle = Math.atan2(bottomLeftdY, bottomLeftdX) * 180 / Math.PI;
+		bottomLeftAngle = 360 - bottomLeftAngle;
+		
+		// Bottom right angle
+		double bottomRightdY = bottomLeftdY;
+		double bottomRightdX = topRightdX;
+		double bottomRightAngle = Math.atan2(bottomRightdY, bottomRightdX) * 180 / Math.PI;
+		bottomRightAngle = 360 - bottomRightAngle;
+		
+		// System.out.println("TR = " + topRightAngle + "\nTL = " + topLeftAngle + "\nBR = " + bottomRightAngle + "\nBL = " + bottomLeftAngle); // DEBUG
+		
+		// Ball hits the bricks
+		for (Bricks b : bg.brick)
+		{
+			if(bg.ball.collides(b) != null)
+			{		
+				// Reference: http://stackoverflow.com/questions/7586063/how-to-calculate-the-angle-between-a-line-and-the-horizontal-axis
+				double deltaY = bg.ball.getY() - b.getY();
+				double deltaX = bg.ball.getX() - b.getX();
+				
+				double ballAngle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+				
+				if(ballAngle > 0)
+					ballAngle = 360 - ballAngle;
+				else if(ballAngle < 0)
+					ballAngle = -ballAngle;
+				
+				//System.out.println("angle = " + angleInDegrees); // DEBUG
+				
+				if(lastBrickHit != b)
+				{
+					if(ballAngle >= topRightAngle && ballAngle <= topLeftAngle) // Top of the brick
+					{
+						bg.ball.bounce(0); 
+					}
+					else if(ballAngle <= bottomRightAngle && ballAngle >= bottomLeftAngle) // Bottom of the brick
+					{
+						bg.ball.bounce(0);
+					}
+					else if(ballAngle <= bottomLeftAngle && ballAngle >= topLeftAngle) // Left of the brick
+					{
+						bg.ball.bounce(90);
+					}
+					else  // Right of the brick
+					{
+						bg.ball.bounce(90);
+					}
+				}
+				bounced = true;
+				bounces++;
+				lastBrickHit = b;
+				b.decrementHP(1);
+				
+				
+				break;	
+			}
+		}
+		
+		// Remove bricks when their HP is 0
+		for (Iterator<Bricks> b = bg.brick.iterator(); b.hasNext();)
+		{
+			if(b.next().getHP() == 0)
+			{
+				b.remove();
+				bricksRemaining--;
+			}
+		}
+		
+		// All bricks are gone, game is won!
+		if(bricksRemaining == 0)
+		{
+			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(bounces);
+			game.enterState(BounceGame.GAMEOVERSTATE);
+			bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+		}
+		
+		// System.out.println(bricksRemaining); // DEBUG
+			
 		// bounce the ball
 		if (bg.ball.getCoarseGrainedMaxX() > bg.ScreenWidth && bg.ball.getVelocity().getX() > 0) // Right horizontal check
 		{
 			bg.ball.bounce(90);
 			bounced = true;
+			bounces++;
 		} 
 		else if (bg.ball.getCoarseGrainedMinX() < 0 && bg.ball.getVelocity().getX() < 0) // Left horizontal check
 		{
 			bg.ball.bounce(90);
 			bounced = true;
+			bounces++;
 		}
-		else if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY() && bg.ball.getVelocity().getY() > 0) // Bottom vertical check
+		else if (bg.ball.getCoarseGrainedMaxY() > bg.ScreenHeight && bg.ball.getVelocity().getY() > 0) // Bottom vertical check
 		{
-			bg.ball.setPosition(new Vector(bg.ball.getX(), bg.ball.getY()+20));
-			//bg.ball.bounce(0);
 			bounced = true;
 			livesRemaining--;
 			redrawBall = true;
@@ -132,6 +235,7 @@ class PlayingState extends BasicGameState {
 		{
 			bg.ball.bounce(0);
 			bounced = true;
+			bounces++;
 		}
 		
 		if (bounced) {
@@ -141,7 +245,7 @@ class PlayingState extends BasicGameState {
 		
 		if (redrawBall)
 		{
-			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 4);
+			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
 			bg.ball.setVelocity(new Vector(.1f, .2f));
 		}
 		

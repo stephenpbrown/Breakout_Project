@@ -61,7 +61,7 @@ class StartUpState extends BasicGameState {
 
 		if (input.isKeyDown(Input.KEY_SPACE))
 		{
-			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 4);
+			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
 			bg.ball.setVelocity(new Vector(.1f, .2f));
 			bg.enterState(BounceGame.PLAYINGSTATE);	
 		}

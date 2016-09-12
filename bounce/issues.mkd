@@ -12,13 +12,12 @@
 - **[10]** Create paddle that is controllable by the user.
 - **[11]** Create a "lives remaining" indicator and start at 3 lives. When lives remaining = 0, display game over.
 - **[12]** Create a "splash screen" with the name "Steve Brown".
+- **[13]** Create bricks at the top of the screen that break.
 
 ## Open Issues ##
  
-- **[13]** Create bricks at the top of the screen that break (1 hit level 1, 2 hits level 2, etc...)
 - **[14]** Create a progression of 3 levels.
-- **[15]** Put cheat codes that allow the user to see/access features with a single key press.
-- **[16]** Add in various types of bricks that take more bounces to destroy
-- **[17]** Add in custom sounds
-- **[18]** Add persistent high score tracking
-- **[19]** Add power ups
+- **[15]** Add in various types of bricks that take more bounces to destroy
+- **[16]** Add in custom sounds
+- **[17]** Add persistent high score tracking
+- **[18]** Add power ups

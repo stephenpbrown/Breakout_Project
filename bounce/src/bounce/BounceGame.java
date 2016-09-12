@@ -46,18 +46,31 @@ public class BounceGame extends StateBasedGame {
 	public static final int PLAYINGSTATE = 1;
 	public static final int GAMEOVERSTATE = 2;
 	public static final int SPLASHSCREENSTATE = 3;
+	public static final int GAMEWONSTATE = 4;
+	public static final int LEVEL1STATE = 5;
+	public static final int LEVEL2STATE = 6;
+	public static final int LEVEL3STATE = 7;
+	public static final int GOSTATE = 8;
 	
 	public static final String BALL_BALLIMG_RSC = "bounce/resource/ball.png";
 	public static final String BALL_BROKENIMG_RSC = "bounce/resource/brokenball.png";
 	public static final String SPLASH_SCREEN_RSC = "bounce/resource/SplashScreen.png";
-	public static final String GAMEOVER_BANNER_RSC = "bounce/resource/gameover.png";
-	public static final String STARTUP_BANNER_RSC = "bounce/resource/PressSpace.png";
+	public static final String GAMEOVER_BANNER_RSC = "bounce/resource/Gameover1.png";
+	public static final String STARTUP_BANNER_RSC = "bounce/resource/PressSpace1.png";
 	public static final String BANG_EXPLOSIONIMG_RSC = "bounce/resource/explosion.png";
 	public static final String BANG_EXPLOSIONSND_RSC = "bounce/resource/explosion.wav";
 	public static final String PADDLE_LEVEL_1_RSC = "bounce/resource/paddle_level1.png";
-	public static final String PADDLE_LEVEL_2_RSC = "bounce/resource/paddle_level2.png";
+	public static final String SIDE_PADDLE_RSC = "bounce/resource/side_paddle.png";
 	public static final String PADDLE_LEVEL_3_RSC = "bounce/resource/paddle_level3.png";
-
+	public static final String BRICK_RSC = "bounce/resource/brick.png";
+	public static final String BALL_EARTH_RSC = "bounce/resource/ball_earth.png";
+	public static final String BALL_EARTH_DESTROYED_RSC = "bounce/resource/ball_earth_destroyed.png";
+	public static final String LEVEL_1_RSC = "bounce/resource/Level_1.png";
+	public static final String LEVEL_2_RSC = "bounce/resource/Level_2.png";
+	public static final String LEVEL_3_RSC = "bounce/resource/Level_3.png";
+	public static final String GO_RSC = "bounce/resource/Go.png";
+	public static final String GAMEWON_RSC = "bounce/resource/GameWon.png";
+	
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 
@@ -66,6 +79,7 @@ public class BounceGame extends StateBasedGame {
 	Bricks bricks;
 	ArrayList<Bang> explosions; // MAKE SURE THIS IS CLEARED PERIODICALLY
 	ArrayList<Bricks> brick;
+	ArrayList<SidePaddles> paddles;
 
 	/**
 	 * Create the BounceGame frame, saving the width and height for later use.
@@ -84,16 +98,22 @@ public class BounceGame extends StateBasedGame {
 
 		Entity.setCoarseGrainedCollisionBoundary(Entity.AABB);
 		explosions = new ArrayList<Bang>(10);
-		brick = new ArrayList<Bricks>(25);
+		brick = new ArrayList<Bricks>(50);
+		paddles = new ArrayList<SidePaddles>(3);
 	}
 
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
-		//addState(new SplashScreenState());
+		addState(new SplashScreenState());
 		addState(new StartUpState());
 		addState(new GameOverState());
 		addState(new PlayingState());
+		addState(new GameWonState());
+		addState(new Level1State());
+		addState(new Level2State());
+		addState(new Level3State());
+		addState(new GoState());
 		
 		// the sound resource takes a particularly long time to load,
 		// we preload it here to (1) reduce latency when we first play it
@@ -110,8 +130,16 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(STARTUP_BANNER_RSC);
 		ResourceManager.loadImage(BANG_EXPLOSIONIMG_RSC);
 		ResourceManager.loadImage(PADDLE_LEVEL_1_RSC);
-		ResourceManager.loadImage(PADDLE_LEVEL_2_RSC);
 		ResourceManager.loadImage(PADDLE_LEVEL_3_RSC);
+		ResourceManager.loadImage(SIDE_PADDLE_RSC);
+		ResourceManager.loadImage(BRICK_RSC);
+		ResourceManager.loadImage(BALL_EARTH_RSC);
+		ResourceManager.loadImage(BALL_EARTH_DESTROYED_RSC);
+		ResourceManager.loadImage(LEVEL_1_RSC);
+		ResourceManager.loadImage(LEVEL_2_RSC);
+		ResourceManager.loadImage(LEVEL_3_RSC);
+		ResourceManager.loadImage(GO_RSC);
+		ResourceManager.loadImage(GAMEWON_RSC);
 		
 		ball = new Ball(ScreenWidth / 4, ScreenHeight / 2, .1f, .2f);
 		paddle = new Paddle(ScreenWidth / 2, ScreenHeight - 16);

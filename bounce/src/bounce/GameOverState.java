@@ -24,7 +24,6 @@ import org.newdawn.slick.state.transition.HorizontalSplitTransition;
  */
 class GameOverState extends BasicGameState {
 	
-
 	private int timer;
 	private int lastKnownBounces; // the user's score, to be displayed, but not updated.
 	
@@ -52,8 +51,8 @@ class GameOverState extends BasicGameState {
 		
 		for (Bang b : bg.explosions)
 			b.render(g);
-		g.drawImage(ResourceManager.getImage(BounceGame.GAMEOVER_BANNER_RSC), 225,
-				270);
+		g.drawImage(ResourceManager.getImage(BounceGame.GAMEOVER_BANNER_RSC), 185,
+				210);
 
 	}
 

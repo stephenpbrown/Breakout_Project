@@ -7,15 +7,12 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.state.transition.EmptyTransition;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
-import org.newdawn.slick.state.transition.HorizontalSplitTransition;
-import org.newdawn.slick.state.transition.VerticalSplitTransition;
 
 import jig.ResourceManager;
 
-public class SplashScreenState extends BasicGameState
+public class Level2State extends BasicGameState
 {
 	private int timer;
 	private int lastKnownBounces; // the user's score, to be displayed, but not updated.
@@ -27,7 +24,7 @@ public class SplashScreenState extends BasicGameState
 	
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
-		timer = 1500;
+		timer = 1000;
 	}
 
 	public void setUserScore(int bounces) {
@@ -38,10 +35,11 @@ public class SplashScreenState extends BasicGameState
 	public void render(GameContainer container, StateBasedGame game,
 			Graphics g) throws SlickException {
 
-		g.drawImage(ResourceManager.getImage(BounceGame.SPLASH_SCREEN_RSC), 185, 210);
-
+		BounceGame bg = (BounceGame)game;
+		
+		g.drawImage(ResourceManager.getImage(BounceGame.LEVEL_2_RSC), 185, 210);
 	}
-
+	
 	@Override
 	public void update(GameContainer container, StateBasedGame game,
 			int delta) throws SlickException {
@@ -49,8 +47,10 @@ public class SplashScreenState extends BasicGameState
 		
 		timer -= delta;
 		if (timer <= 0)
-			game.enterState(BounceGame.STARTUPSTATE, new FadeOutTransition(), new FadeInTransition() );
-
+		{
+			game.enterState(BounceGame.GOSTATE, new FadeOutTransition(), new FadeInTransition());
+		}
+			
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = ((BounceGame)game).explosions.iterator(); i.hasNext();) {
 			if (!i.next().isActive()) {
@@ -62,6 +62,6 @@ public class SplashScreenState extends BasicGameState
 
 	@Override
 	public int getID() {
-		return BounceGame.SPLASHSCREENSTATE;
+		return BounceGame.LEVEL2STATE;
 	}
 }

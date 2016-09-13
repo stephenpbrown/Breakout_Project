@@ -40,6 +40,8 @@ class StartUpState extends BasicGameState {
 			Graphics g) throws SlickException {
 		BounceGame bg = (BounceGame)game;
 		
+		bg.ball.render(g); // Draw ball
+		
 		g.drawImage(ResourceManager.getImage(BounceGame.STARTUP_BANNER_RSC), 185, 210);	
 		
 		g.drawString("Bounces: ?", 10, 30);
@@ -48,7 +50,6 @@ class StartUpState extends BasicGameState {
 		for (Bang b : bg.explosions)
 			b.render(g);	
 		
-		bg.ball.render(g); // Draw ball
 		//bg.paddle.render(g); // Draw paddle
 	}
 

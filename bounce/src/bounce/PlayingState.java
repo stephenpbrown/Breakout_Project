@@ -162,12 +162,12 @@ class PlayingState extends BasicGameState {
 		resetLives = false;
 		
 		// Move the paddle left
-		if (input.isKeyDown(Input.KEY_LEFT) && !(bg.paddle.getCoarseGrainedMinX() < 0)) 
+		if (input.isKeyDown(Input.KEY_LEFT) && !(bg.paddle.getCoarseGrainedMinX() < 0-30)) 
 		{
 			bg.paddle.setVelocity(new Vector(-0.55f,0));
 		}
 		// Move the paddle right
-		else if (input.isKeyDown(Input.KEY_RIGHT) && !(bg.paddle.getCoarseGrainedMaxX() > bg.ScreenWidth)) 
+		else if (input.isKeyDown(Input.KEY_RIGHT) && !(bg.paddle.getCoarseGrainedMaxX() > bg.ScreenWidth+30)) 
 		{
 			bg.paddle.setVelocity(new Vector(0.55f, 0));
 		}
@@ -219,7 +219,7 @@ class PlayingState extends BasicGameState {
 				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
 				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
 				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.13f, .23f));
+				bg.ball.setVelocity(new Vector(.09f, .19f));
 				paddleAlreadyHit = false;
 				bg.ball.removeBrokenBall();
 			}
@@ -231,7 +231,7 @@ class PlayingState extends BasicGameState {
 				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
 				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
 				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.17f, .27f));
+				bg.ball.setVelocity(new Vector(.09f, .19f));
 				paddleAlreadyHit = false;
 				bg.ball.removeBrokenBall();
 			}
@@ -259,7 +259,7 @@ class PlayingState extends BasicGameState {
 				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
 				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
 				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.1f, .2f));
+				bg.ball.setVelocity(new Vector(.09f, .19f));
 				paddleAlreadyHit = false;
 				bg.ball.removeBrokenBall();
 				game.enterState(BounceGame.LEVEL1STATE);
@@ -271,7 +271,7 @@ class PlayingState extends BasicGameState {
 				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
 				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
 				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.13f, .23f));
+				bg.ball.setVelocity(new Vector(.09f, .19f));
 				paddleAlreadyHit = false;
 				bg.ball.removeBrokenBall();
 				game.enterState(BounceGame.LEVEL2STATE);
@@ -283,7 +283,7 @@ class PlayingState extends BasicGameState {
 				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
 				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
 				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.17f, .27f));
+				bg.ball.setVelocity(new Vector(.09f, .19f));
 				paddleAlreadyHit = false;
 				bg.ball.removeBrokenBall();
 				game.enterState(BounceGame.LEVEL3STATE);
@@ -295,7 +295,7 @@ class PlayingState extends BasicGameState {
 				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
 				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
 				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.17f, .27f));
+				bg.ball.setVelocity(new Vector(.09f, .19f));
 				paddleAlreadyHit = false;
 				resetLives = true;
 				bg.ball.removeBrokenBall();
@@ -339,15 +339,39 @@ class PlayingState extends BasicGameState {
 				
 				if(ballAngle >= paddleTopRightAngle && ballAngle <= paddleTopLeftAngle) // Top of the paddle
 				{
-					bg.ball.bounce(0); 
+					double direction = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+					
+					double offset = bg.paddle.getX() - bg.ball.getX();
+					double maxOffset = bg.paddle.getCoarseGrainedWidth()/2 + bg.ball.getCoarseGrainedWidth();
+					
+					double scaleX = 0;
+					if(level == 1)
+						scaleX = 0.3;
+					else if(level == 2)
+						scaleX = 0.33;
+					else if(level == 3)
+						scaleX = 0.37;
+					
+					double xVelocity = Math.abs((offset/maxOffset)) * scaleX;
+					
+					if(offset > 0)
+						xVelocity = -xVelocity;
+						
+					double yVelocity = Math.sqrt(scaleX*scaleX - xVelocity*xVelocity);
+					
+//					System.out.println("xVelocity = " + xVelocity + ", yVelcity = " + yVelocity);
+//					System.out.println(bg.ball.getVelocity());
+					//System.out.println("direction = " + direction); // + ", ballAngle = " + ballAngle);
+					bg.ball.setVelocity(new Vector((float) xVelocity, (float) yVelocity*(-1)));
+					//bg.ball.bounce(0); 
 				}
 				else if(ballAngle >= paddleTopLeftAngle) // Left of the paddle
 				{
-					bg.ball.bounce(90);
+					bg.ball.bounce(0);
 				}
 				else  // Right of the brick
 				{
-					bg.ball.bounce(90);
+					bg.ball.bounce(0);
 				}
 				
 				bounced = true;
@@ -556,12 +580,7 @@ class PlayingState extends BasicGameState {
 		if (redrawBall)
 		{
 			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-			if(level == 1)
-				bg.ball.setVelocity(new Vector(.1f, .2f));
-			else if(level == 2)
-				bg.ball.setVelocity(new Vector(.13f, .23f));
-			else if(level == 3)
-				bg.ball.setVelocity(new Vector(.17f, .27f));
+			bg.ball.setVelocity(new Vector(.09f, .19f));
 		}
 		
 		bg.ball.update(delta);

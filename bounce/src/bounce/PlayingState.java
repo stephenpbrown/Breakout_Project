@@ -35,6 +35,7 @@ class PlayingState extends BasicGameState {
 	SidePaddles lastSidePaddleHit = null;
 	boolean paddleAlreadyHit = false;
 	boolean resetLives = true;
+	Bricks refBrick = null;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -73,38 +74,53 @@ class PlayingState extends BasicGameState {
 			// Add bricks
 			for (int i = 1; i < numBricks; i++)
 			{
-				bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight / 4));
+				bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight / 4, 1));
 				bricksRemaining = i;
-			}
+			}		
 		}
 		
 		// Level 2 bricks
 		if(level == 2)
 		{
 			// Add bricks
-			for (int i = 1; i < numBricks; i++)
+			for (int i = 2; i < numBricks; i+=2)
 			{
 				for(int j = 1; j < 4; j++)
-					bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight/2 - 50*j));
+					bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight/2 - 50*j, 1));
 				bricksRemaining = i;
 			}
-			bricksRemaining *= 3;
+			for (int i = 1; i < numBricks; i+=2)
+			{
+				for(int j = 1; j < 4; j++)
+					bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight/2 - 50*j, 2));
+			}
+			bricksRemaining *= 4;
+//			System.out.println(bricksRemaining); DEBUG
 		}
 		
 		// Level 3 bricks
 		if(level == 3)
 		{
 			// Add bricks
-			for (int i = 1; i < numBricks; i++)
+			for (int i = 2; i < numBricks; i+=2)
 			{
 				for(int j = 1; j < 6; j++)
-					bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight/2 - 40*j));
+					bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight/2 - 40*j, 2));
 				bricksRemaining = i;
 			}
-			bricksRemaining *= 5;
+			for (int i = 1; i < numBricks; i+=2)
+			{
+				for(int j = 1; j < 6; j++)
+					bg.brick.add(new Bricks(i*bg.ScreenWidth / numBricks, bg.ScreenHeight/2 - 40*j, 3));
+				bricksRemaining = i;
+			}
+			bricksRemaining *= 8;
 		}
 		
 		// Side paddles
+		Bricks refBrickInit = new Bricks(bg.ScreenWidth, bg.ScreenHeight, 1);
+		refBrick = refBrickInit;
+		
 		bg.paddles.add(new SidePaddles(16, bg.ScreenHeight-110));
 		bg.paddles.add(new SidePaddles(bg.ScreenWidth-16, bg.ScreenHeight-110));
 	}
@@ -179,6 +195,115 @@ class PlayingState extends BasicGameState {
 		bg.paddles.get(0).update(delta);
 		bg.paddles.get(1).update(delta);
 		
+		// Remove bricks when their HP is 0
+		for (Iterator<Bricks> b = bg.brick.iterator(); b.hasNext();)
+		{
+			// System.out.println(b.hasNext()); // DEBUG
+			if(b.next().getHP() == 0)
+			{
+				if(!bg.brick.isEmpty()){
+					b.remove();
+					bricksRemaining--;
+				}
+			}
+		}
+		//System.out.println(bg.brick.size());
+		// All bricks are gone, game is won!
+		if(bg.brick.isEmpty())
+		{
+			if(level == 1)
+			{
+				game.enterState(BounceGame.LEVEL2STATE);
+				level = 2;
+				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+				bg.ball.setVelocity(new Vector(.13f, .23f));
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+			}
+			else if(level == 2)
+			{
+				game.enterState(BounceGame.LEVEL3STATE);
+				level = 3;
+				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+				bg.ball.setVelocity(new Vector(.17f, .27f));
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+			}
+			else if(level == 3)
+			{
+				((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(bounces);
+				game.enterState(BounceGame.GAMEWONSTATE);
+				level = 1;
+				resetLives = true;
+				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+			}
+		}
+		
+		// Keyboard shortcuts
+		if(input.isKeyDown(Input.KEY_LCONTROL) || input.isKeyDown(Input.KEY_RCONTROL))
+		{
+			if(input.isKeyDown(Input.KEY_1))
+			{
+				level = 1;
+				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+				bg.ball.setVelocity(new Vector(.1f, .2f));
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+				game.enterState(BounceGame.LEVEL1STATE);
+			}
+			else if(input.isKeyDown(Input.KEY_2))
+			{
+				level = 2;
+				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+				bg.ball.setVelocity(new Vector(.13f, .23f));
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+				game.enterState(BounceGame.LEVEL2STATE);
+			}
+			else if(input.isKeyDown(Input.KEY_3))
+			{
+				level = 3;
+				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+				bg.ball.setVelocity(new Vector(.17f, .27f));
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+				game.enterState(BounceGame.LEVEL3STATE);
+			}
+			else if(input.isKeyDown(Input.KEY_4))
+			{
+				level = 1;
+				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+				bg.ball.setVelocity(new Vector(.17f, .27f));
+				paddleAlreadyHit = false;
+				resetLives = true;
+				bg.ball.removeBrokenBall();
+				((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(bounces);
+				game.enterState(BounceGame.GAMEWONSTATE);
+			}
+		}
+
 		// Top right angle
 		double paddleTopRightdY = (bg.paddle.getCoarseGrainedMinY() - bg.ball.getCoarseGrainedHeight()/2)  - bg.paddle.getY();
 		double paddleTopRightdX  = (bg.paddle.getCoarseGrainedMaxX() + bg.ball.getCoarseGrainedWidth()/2) - bg.paddle.getX();
@@ -303,10 +428,6 @@ class PlayingState extends BasicGameState {
 			}
 		}
 		
-		Bricks refBrick = null;
-		if(bg.brick.get(0) != null)
-			refBrick = bg.brick.get(0);
-		
 		// Top right angle
 		topRightdY = (refBrick.getCoarseGrainedMinY() - bg.ball.getCoarseGrainedHeight()/2)  - refBrick.getY();
 		topRightdX  = (refBrick.getCoarseGrainedMaxX() + bg.ball.getCoarseGrainedWidth()/2) - refBrick.getX();
@@ -375,117 +496,11 @@ class PlayingState extends BasicGameState {
 				lastBrickHit = b;
 				lastSidePaddleHit = null;
 				paddleAlreadyHit = false;
-				b.decrementHP(1);
+				
+				if(b.getHP() > 0)
+					b.decrementHP(1);
 				
 				break;	
-			}
-		}
-		
-		// Remove bricks when their HP is 0
-		for (Iterator<Bricks> b = bg.brick.iterator(); b.hasNext();)
-		{
-			if(b.next().getHP() == 0)
-			{
-				b.remove();
-				bricksRemaining--;
-			}
-		}
-		
-		// All bricks are gone, game is won!
-		if(bricksRemaining == 0)
-		{
-			if(level == 1)
-			{
-				level = 2;
-				//((LevelUpState)game.getState(BounceGame.LEVELUPSTATE)).setUserScore(bounces);
-				//game.enterState(BounceGame.LEVELUPSTATE);
-				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.13f, .23f));
-				paddleAlreadyHit = false;
-				bg.ball.removeBrokenBall();
-				game.enterState(BounceGame.LEVEL2STATE);
-			}
-			else if(level == 2)
-			{
-				level = 3;
-				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.17f, .27f));
-				paddleAlreadyHit = false;
-				bg.ball.removeBrokenBall();
-				game.enterState(BounceGame.LEVEL3STATE);
-			}
-			else if(level == 3)
-			{
-				level = 1;
-				resetLives = true;
-				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-				paddleAlreadyHit = false;
-				bg.ball.removeBrokenBall();
-				((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(bounces);
-				game.enterState(BounceGame.GAMEWONSTATE);
-			}
-		}
-		
-		// Keyboard shortcuts
-		if(input.isKeyDown(Input.KEY_LCONTROL) || input.isKeyDown(Input.KEY_RCONTROL))
-		{
-			if(input.isKeyDown(Input.KEY_1))
-			{
-				level = 1;
-				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.1f, .2f));
-				paddleAlreadyHit = false;
-				bg.ball.removeBrokenBall();
-				game.enterState(BounceGame.LEVEL1STATE);
-			}
-			else if(input.isKeyDown(Input.KEY_2))
-			{
-				level = 2;
-				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.13f, .23f));
-				paddleAlreadyHit = false;
-				bg.ball.removeBrokenBall();
-				game.enterState(BounceGame.LEVEL2STATE);
-			}
-			else if(input.isKeyDown(Input.KEY_3))
-			{
-				level = 3;
-				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.17f, .27f));
-				paddleAlreadyHit = false;
-				bg.ball.removeBrokenBall();
-				game.enterState(BounceGame.LEVEL3STATE);
-			}
-			else if(input.isKeyDown(Input.KEY_4))
-			{
-				level = 1;
-				bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-				bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-				bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-				bg.ball.setVelocity(new Vector(.17f, .27f));
-				paddleAlreadyHit = false;
-				resetLives = true;
-				bg.ball.removeBrokenBall();
-				((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(bounces);
-				game.enterState(BounceGame.GAMEWONSTATE);
 			}
 		}
 		

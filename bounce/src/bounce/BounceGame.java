@@ -63,6 +63,8 @@ public class BounceGame extends StateBasedGame {
 	public static final String SIDE_PADDLE_RSC = "bounce/resource/side_paddle.png";
 	public static final String PADDLE_LEVEL_3_RSC = "bounce/resource/paddle_level3.png";
 	public static final String BRICK_RSC = "bounce/resource/brick.png";
+	public static final String BRICK_LEVEL_2_RSC = "bounce/resource/brick_level_2.png";
+	public static final String BRICK_LEVEL_3_RSC = "bounce/resource/brick_level_3.png";
 	public static final String BALL_EARTH_RSC = "bounce/resource/ball_earth.png";
 	public static final String BALL_EARTH_DESTROYED_RSC = "bounce/resource/ball_earth_destroyed.png";
 	public static final String LEVEL_1_RSC = "bounce/resource/Level_1.png";
@@ -105,7 +107,7 @@ public class BounceGame extends StateBasedGame {
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
-		addState(new SplashScreenState());
+		//addState(new SplashScreenState());
 		addState(new StartUpState());
 		addState(new GameOverState());
 		addState(new PlayingState());
@@ -133,6 +135,8 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(PADDLE_LEVEL_3_RSC);
 		ResourceManager.loadImage(SIDE_PADDLE_RSC);
 		ResourceManager.loadImage(BRICK_RSC);
+		ResourceManager.loadImage(BRICK_LEVEL_2_RSC);
+		ResourceManager.loadImage(BRICK_LEVEL_3_RSC);
 		ResourceManager.loadImage(BALL_EARTH_RSC);
 		ResourceManager.loadImage(BALL_EARTH_DESTROYED_RSC);
 		ResourceManager.loadImage(LEVEL_1_RSC);

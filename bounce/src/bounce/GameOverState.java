@@ -10,6 +10,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.FadeInTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.HorizontalSplitTransition;
 
 
@@ -24,9 +26,9 @@ import org.newdawn.slick.state.transition.HorizontalSplitTransition;
  */
 class GameOverState extends BasicGameState {
 	
-
 	private int timer;
 	private int lastKnownBounces; // the user's score, to be displayed, but not updated.
+	private int lastKnownScore;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -38,8 +40,8 @@ class GameOverState extends BasicGameState {
 		timer = 4000;
 	}
 
-	public void setUserScore(int bounces) {
-		lastKnownBounces = bounces;
+	public void setUserScore(int score) {
+		lastKnownScore = score;
 	}
 	
 	@Override
@@ -47,11 +49,14 @@ class GameOverState extends BasicGameState {
 			Graphics g) throws SlickException {
 
 		BounceGame bg = (BounceGame)game;
-		g.drawString("Bounces: " + lastKnownBounces, 10, 30);
+		g.drawString("Score: " + lastKnownScore, 10, 30);
+		g.drawString("Highscore: " + ((StartUpState)game.getState(BounceGame.STARTUPSTATE)).getUserHighScore(), 620, 10);
+		g.drawString("Lives Remaining: 0", 10, 50);
+		
 		for (Bang b : bg.explosions)
 			b.render(g);
-		g.drawImage(ResourceManager.getImage(BounceGame.GAMEOVER_BANNER_RSC), 225,
-				270);
+		g.drawImage(ResourceManager.getImage(BounceGame.GAMEOVER_BANNER_RSC), 185,
+				210);
 
 	}
 
@@ -62,8 +67,10 @@ class GameOverState extends BasicGameState {
 		
 		timer -= delta;
 		if (timer <= 0)
-			game.enterState(BounceGame.STARTUPSTATE, new EmptyTransition(), new HorizontalSplitTransition() );
-
+		{
+			game.enterState(BounceGame.STARTUPSTATE, new FadeOutTransition(), new FadeInTransition() );
+		}
+			
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = ((BounceGame)game).explosions.iterator(); i.hasNext();) {
 			if (!i.next().isActive()) {

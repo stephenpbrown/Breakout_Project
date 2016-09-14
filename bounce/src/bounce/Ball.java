@@ -18,15 +18,15 @@ import jig.Vector;
 	public Ball(final float x, final float y, final float vx, final float vy) {
 		super(x, y);
 		addImageWithBoundingBox(ResourceManager
-				.getImage(BounceGame.BALL_BALLIMG_RSC));
+				.getImage(BounceGame.BALL_EARTH_RSC)); // LOAD IMAGE BEFORE YOU GET TO CONSTRUCTOR
 		velocity = new Vector(vx, vy);
 		countdown = 0;
 	}
-
+	
 	public void setVelocity(final Vector v) {
 		velocity = v;
 	}
-
+	
 	public Vector getVelocity() {
 		return velocity;
 	}
@@ -40,13 +40,20 @@ import jig.Vector;
 	 * @param surfaceTangent
 	 */
 	public void bounce(float surfaceTangent) {
-		removeImage(ResourceManager.getImage(BounceGame.BALL_BALLIMG_RSC));
-		addImageWithBoundingBox(ResourceManager
-				.getImage(BounceGame.BALL_BROKENIMG_RSC));
-		countdown = 500;
+		//removeImage(ResourceManager.getImage(BounceGame.BALL_EARTH_RSC));
+//		addImageWithBoundingBox(ResourceManager
+//				.getImage(BounceGame.BALL_EARTH_DESTROYED_RSC)); 
+		countdown = 500; // Milliseconds
 		velocity = velocity.bounce(surfaceTangent);
 	}
 
+	public void removeBrokenBall()
+	{
+		removeImage(ResourceManager.getImage(BounceGame.BALL_EARTH_DESTROYED_RSC));
+		addImageWithBoundingBox(ResourceManager
+				.getImage(BounceGame.BALL_EARTH_RSC)); 
+	}
+	
 	/**
 	 * Update the Ball based on how much time has passed...
 	 * 
@@ -54,14 +61,14 @@ import jig.Vector;
 	 *            the number of milliseconds since the last update
 	 */
 	public void update(final int delta) {
-		translate(velocity.scale(delta));
+		translate(velocity.scale(delta)); // SCALING HERE IS VERY IMPORTANT
 		if (countdown > 0) {
 			countdown -= delta;
 			if (countdown <= 0) {
 				addImageWithBoundingBox(ResourceManager
-						.getImage(BounceGame.BALL_BALLIMG_RSC));
+						.getImage(BounceGame.BALL_EARTH_RSC));
 				removeImage(ResourceManager
-						.getImage(BounceGame.BALL_BROKENIMG_RSC));
+						.getImage(BounceGame.BALL_EARTH_DESTROYED_RSC));
 			}
 		}
 	}

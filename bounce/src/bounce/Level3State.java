@@ -11,6 +11,7 @@ import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 
 import jig.ResourceManager;
+import jig.Vector;
 
 public class Level3State extends BasicGameState
 {
@@ -47,10 +48,16 @@ public class Level3State extends BasicGameState
 	public void update(GameContainer container, StateBasedGame game,
 			int delta) throws SlickException {
 		
-		
+		BounceGame bg = (BounceGame)game;
 		timer -= delta;
 		if (timer <= 0)
 		{
+			bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+			bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+			bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+			bg.ball.setVelocity(new Vector(.09f, .19f));
+			bg.ball.removeBrokenBall();
 			game.enterState(BounceGame.GOSTATE, new FadeOutTransition(), new FadeInTransition());
 		}
 			

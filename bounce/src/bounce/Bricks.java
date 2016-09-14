@@ -10,6 +10,7 @@ public class Bricks extends Entity
 	private int hp_left = 1;
 	private int level = 1;
 	
+	// Brick images from http://www.redlandbrick.com/onlinecatalog/brick-colors/lawrenceville-brick/223/bark-(wavetex)-red-(204)
 	public Bricks(final float x, final float y, final int l)
 	{
 		super(x, y);

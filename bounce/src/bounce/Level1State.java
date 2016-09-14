@@ -12,6 +12,7 @@ import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 
 import jig.ResourceManager;
+import jig.Vector;
 
 public class Level1State extends BasicGameState
 {
@@ -27,6 +28,10 @@ public class Level1State extends BasicGameState
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
 		timer = 1000;
+		
+		BounceGame bg = (BounceGame)game;
+		
+		//sResourceManager.getSound(bg.LEVEL_SONG_RSC).play();
 	}
 
 	public void setUserScore(int score) {
@@ -39,6 +44,8 @@ public class Level1State extends BasicGameState
 
 		BounceGame bg = (BounceGame)game;
 		
+		
+		
 //		g.drawString("Score: " + 0, 10, 30);
 //		g.drawString("Highscore: " + ((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).getUserHighScore(), 620, 10);
 		
@@ -50,9 +57,17 @@ public class Level1State extends BasicGameState
 			int delta) throws SlickException {
 		
 		
+		BounceGame bg = (BounceGame)game;
+		
 		timer -= delta;
 		if (timer <= 0)
 		{
+			bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
+//			bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
+//			bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
+			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+			bg.ball.setVelocity(new Vector(.09f, .19f));
+			bg.ball.removeBrokenBall();
 			game.enterState(BounceGame.GOSTATE, new FadeOutTransition(), new FadeInTransition());
 		}
 			

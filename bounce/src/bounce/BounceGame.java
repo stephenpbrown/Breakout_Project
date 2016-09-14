@@ -52,13 +52,25 @@ public class BounceGame extends StateBasedGame {
 	public static final int LEVEL3STATE = 7;
 	public static final int GOSTATE = 8;
 	
+	// Sounds
+	public static final String BANG_EXPLOSIONSND_RSC = "bounce/resource/explosion.wav";
+	public static final String BRICK_EXPLOSIONSND_RSC = "bounce/resource/explosion_brick.wav";
+	public static final String PADDLE_HITSND_RSC = "bounce/resource/paddle_hit.wav";
+	public static final String SIDEPADDLE_HITSND_RSC = "bounce/resource/sidepaddle_hit.wav";
+	public static final String BRICK_HITSND_RSC = "bounce/resource/brick_hit.wav";
+	public static final String BALL_DIEDSND_RSC = "bounce/resource/ball_died.wav";
+	public static final String STARTUP_SONG_RSC = "bounce/resource/startup_song.wav";
+//	public static final String GAMEOVER_SONG_RSC = "bounce/resource/gameover_song.wav";
+//	public static final String GAMEWON_SONG_RSC = "bounce/resource/gamewon_song.wav";
+//	public static final String LEVEL_SONG_RSC = "bounce/resource/level_song.wav";
+	
+	// Sprites
 	public static final String BALL_BALLIMG_RSC = "bounce/resource/ball.png";
 	public static final String BALL_BROKENIMG_RSC = "bounce/resource/brokenball.png";
 	public static final String SPLASH_SCREEN_RSC = "bounce/resource/SplashScreen.png";
 	public static final String GAMEOVER_BANNER_RSC = "bounce/resource/Gameover2.png";
 	public static final String STARTUP_BANNER_RSC = "bounce/resource/PressSpace1.png";
 	public static final String BANG_EXPLOSIONIMG_RSC = "bounce/resource/explosion.png";
-	public static final String BANG_EXPLOSIONSND_RSC = "bounce/resource/explosion.wav";
 	public static final String PADDLE_LEVEL_1_RSC = "bounce/resource/paddle_level1.png";
 	public static final String SIDE_PADDLE_RSC = "bounce/resource/side_paddle.png";
 	public static final String PADDLE_LEVEL_3_RSC = "bounce/resource/paddle_level3.png";
@@ -72,6 +84,7 @@ public class BounceGame extends StateBasedGame {
 	public static final String LEVEL_3_RSC = "bounce/resource/Level_3.png";
 	public static final String GO_RSC = "bounce/resource/Go.png";
 	public static final String GAMEWON_RSC = "bounce/resource/GameWon.png";
+	public static final String BACKGROUND_RSC = "bounce/resource/background.jpg";
 	
 	public final int ScreenWidth;
 	public final int ScreenHeight;
@@ -100,14 +113,14 @@ public class BounceGame extends StateBasedGame {
 
 		Entity.setCoarseGrainedCollisionBoundary(Entity.AABB);
 		explosions = new ArrayList<Bang>(10);
-		brick = new ArrayList<Bricks>(50);
+		brick = new ArrayList<Bricks>(100);
 		paddles = new ArrayList<SidePaddles>(3);
 	}
 
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
-		//addState(new SplashScreenState());
+		addState(new SplashScreenState());
 		addState(new StartUpState());
 		addState(new GameOverState());
 		addState(new PlayingState());
@@ -123,6 +136,15 @@ public class BounceGame extends StateBasedGame {
 		// unless that is done now, we can't *disable* sound as we
 		// attempt to do in the startUp() method.
 		ResourceManager.loadSound(BANG_EXPLOSIONSND_RSC);	
+		ResourceManager.loadSound(BRICK_EXPLOSIONSND_RSC);
+		ResourceManager.loadSound(PADDLE_HITSND_RSC);
+		ResourceManager.loadSound(SIDEPADDLE_HITSND_RSC);
+		ResourceManager.loadSound(BRICK_HITSND_RSC);
+		ResourceManager.loadSound(BALL_DIEDSND_RSC);
+		ResourceManager.loadSound(STARTUP_SONG_RSC);
+//		ResourceManager.loadSound(GAMEOVER_SONG_RSC);
+//		ResourceManager.loadSound(GAMEWON_SONG_RSC);
+//		ResourceManager.loadSound(LEVEL_SONG_RSC);
 
 		// preload all the resources to avoid warnings & minimize latency...
 		ResourceManager.loadImage(BALL_BALLIMG_RSC);
@@ -144,6 +166,7 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(LEVEL_3_RSC);
 		ResourceManager.loadImage(GO_RSC);
 		ResourceManager.loadImage(GAMEWON_RSC);
+		ResourceManager.loadImage(BACKGROUND_RSC);
 		
 		ball = new Ball(ScreenWidth / 4, ScreenHeight / 2, .1f, .2f);
 		paddle = new Paddle(ScreenWidth / 2, ScreenHeight - 16);

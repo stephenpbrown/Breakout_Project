@@ -28,6 +28,7 @@ public class SplashScreenState extends BasicGameState
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
 		timer = 1500;
+		ResourceManager.getSound(BounceGame.STARTUP_SONG_RSC).loop();
 	}
 
 	public void setUserScore(int bounces) {
@@ -49,7 +50,7 @@ public class SplashScreenState extends BasicGameState
 		
 		timer -= delta;
 		if (timer <= 0)
-			game.enterState(BounceGame.STARTUPSTATE, new EmptyTransition(), new FadeInTransition() );
+			game.enterState(BounceGame.STARTUPSTATE, new FadeOutTransition(), new FadeInTransition());
 
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = ((BounceGame)game).explosions.iterator(); i.hasNext();) {

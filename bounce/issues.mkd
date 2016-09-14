@@ -16,9 +16,9 @@
 - **[14]** Create a progression of 3 levels.
 - **[15]** Add in various types of bricks that take more bounces to destroy
 - **[16]** Make the bottom paddle bounce the ball different depending on where it hits
+- **[17]** Add persistent high score tracking
+- **[18]** Add in custom sounds and background music
 
 ## Open Issues ##
  
-- **[17]** Add persistent high score tracking
-- **[18]** Add in custom sounds
 - **[19]** Add power ups

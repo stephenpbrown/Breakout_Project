@@ -15,7 +15,7 @@ import jig.ResourceManager;
 public class Level3State extends BasicGameState
 {
 	private int timer;
-	private int lastKnownBounces; // the user's score, to be displayed, but not updated.
+	private int lastKnownScore; // the user's score, to be displayed, but not updated.
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -27,8 +27,8 @@ public class Level3State extends BasicGameState
 		timer = 1000;
 	}
 
-	public void setUserScore(int bounces) {
-		lastKnownBounces = bounces;
+	public void setUserScore(int score) {
+		lastKnownScore = score;
 	}
 	
 	@Override
@@ -36,6 +36,9 @@ public class Level3State extends BasicGameState
 			Graphics g) throws SlickException {
 
 		BounceGame bg = (BounceGame)game;
+		
+//		g.drawString("Score: " + lastKnownScore, 10, 30);
+//		g.drawString("Highscore: " + ((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).getUserHighScore(), 620, 10);
 		
 		g.drawImage(ResourceManager.getImage(BounceGame.LEVEL_3_RSC), 185, 210);
 	}

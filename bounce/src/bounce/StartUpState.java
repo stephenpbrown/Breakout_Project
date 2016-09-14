@@ -1,6 +1,9 @@
 package bounce;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.Scanner;
 
 import jig.ResourceManager;
 import jig.Vector;
@@ -24,6 +27,8 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 class StartUpState extends BasicGameState {
 
+	int highScore;
+	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
@@ -32,9 +37,28 @@ class StartUpState extends BasicGameState {
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
 		container.setSoundOn(false);
+		
+		try {
+			highScore = readHighScore();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
+	public int readHighScore() throws FileNotFoundException
+	{
+		Scanner scanner = new Scanner(new File("highScore.txt"));
+		int score = scanner.nextInt();
+		System.out.println(score);
+		return score;
+	}
 
+	public int getUserHighScore()
+	{
+		return highScore;
+	}
+	
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
 			Graphics g) throws SlickException {
@@ -44,8 +68,10 @@ class StartUpState extends BasicGameState {
 		
 		g.drawImage(ResourceManager.getImage(BounceGame.STARTUP_BANNER_RSC), 185, 210);	
 		
-		g.drawString("Bounces: ?", 10, 30);
-		g.drawString("Lives Remaining: ?", 10, 50);
+		//g.drawString("Score: 0", 10, 30);
+		//g.drawString("Highscore: " + ((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).getUserHighScore(), 620, 10);
+		g.drawString("Highscore: " + highScore, 620, 10);
+		//g.drawString("Lives Remaining: ?", 10, 50);
 		
 		for (Bang b : bg.explosions)
 			b.render(g);	
@@ -64,6 +90,7 @@ class StartUpState extends BasicGameState {
 		{
 			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
 			bg.ball.setVelocity(new Vector(.1f, .2f));
+			bg.ball.removeBrokenBall();
 			bg.enterState(BounceGame.LEVEL1STATE);	
 		}
 			
@@ -91,13 +118,13 @@ class StartUpState extends BasicGameState {
 		}
 		
 		// Bounce off the paddle
-		if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
-			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
-			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX())
-		{
-			bg.ball.bounce(0);
-			bounced = true;
-		}
+//		if (bg.ball.getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()
+//			&& bg.ball.getCoarseGrainedMinX() < bg.paddle.getCoarseGrainedMaxX()
+//			&& bg.ball.getCoarseGrainedMaxX() > bg.paddle.getCoarseGrainedMinX())
+//		{
+//			bg.ball.bounce(0);
+//			bounced = true;
+//		}
 		
 		if (bounced) {
 			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));

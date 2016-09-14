@@ -1,6 +1,14 @@
 package bounce;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Iterator;
+import java.util.Scanner;
+
+import javax.naming.Context;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -15,7 +23,8 @@ import jig.ResourceManager;
 public class GameWonState extends BasicGameState
 {
 	private int timer;
-	private int lastKnownBounces; // the user's score, to be displayed, but not updated.
+	private int lastKnownScore;
+	private int lastKnownHighScore;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -27,8 +36,31 @@ public class GameWonState extends BasicGameState
 		timer = 4000;
 	}
 
-	public void setUserScore(int bounces) {
-		lastKnownBounces = bounces;
+	public void setUserScore(int score) {
+		lastKnownScore = score;
+	}
+	
+	public int getUserScore()
+	{
+		return lastKnownScore;
+	}
+	
+	public void setUserHighScore(int highScore)
+	{
+		lastKnownHighScore = highScore;
+	}
+	
+	public int getUserHighScore()
+	{
+		return lastKnownHighScore;
+	}
+	
+	public void saveHighScore(int highScore) throws IOException
+	{
+		System.out.println("Saving highScore: " + highScore);
+		Writer wr = new FileWriter("highScore.txt");
+		wr.write(String.valueOf(highScore));
+		wr.close();
 	}
 	
 	@Override
@@ -36,8 +68,10 @@ public class GameWonState extends BasicGameState
 			Graphics g) throws SlickException {
 
 		BounceGame bg = (BounceGame)game;
-		g.drawString("Bounces: " + lastKnownBounces, 10, 30);
-		g.drawString("Lives Remaining: 0", 10, 50);
+		
+		g.drawString("Score: " + lastKnownScore, 10, 30);
+		g.drawString("Highscore: " + lastKnownHighScore, 620, 10);
+		//g.drawString("Lives Remaining: 0", 10, 50);
 		
 		for (Bang b : bg.explosions)
 			b.render(g);

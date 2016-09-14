@@ -12,8 +12,11 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.FadeInTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 
 /**
  * This state is active prior to the Game starting. In this state, sound is
@@ -36,7 +39,9 @@ class StartUpState extends BasicGameState {
 	
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) {
-		container.setSoundOn(false);
+		container.setSoundOn(true);
+		
+		BounceGame bg = (BounceGame)game;
 		
 		try {
 			highScore = readHighScore();
@@ -44,13 +49,15 @@ class StartUpState extends BasicGameState {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+		bg.ball.setVelocity(new Vector(.1f, .2f));
 	}
 
 	public int readHighScore() throws FileNotFoundException
 	{
 		Scanner scanner = new Scanner(new File("highScore.txt"));
 		int score = scanner.nextInt();
-		System.out.println(score);
+		//System.out.println(score);
 		return score;
 	}
 
@@ -64,6 +71,8 @@ class StartUpState extends BasicGameState {
 			Graphics g) throws SlickException {
 		BounceGame bg = (BounceGame)game;
 		
+		g.drawImage(ResourceManager.getImage(BounceGame.BACKGROUND_RSC), 0, 0); // Draw background
+		
 		bg.ball.render(g); // Draw ball
 		
 		g.drawImage(ResourceManager.getImage(BounceGame.STARTUP_BANNER_RSC), 185, 210);	
@@ -73,8 +82,8 @@ class StartUpState extends BasicGameState {
 		g.drawString("Highscore: " + highScore, 620, 10);
 		//g.drawString("Lives Remaining: ?", 10, 50);
 		
-		for (Bang b : bg.explosions)
-			b.render(g);	
+//		for (Bang b : bg.explosions)
+//			b.render(g);	
 		
 		//bg.paddle.render(g); // Draw paddle
 	}
@@ -88,10 +97,10 @@ class StartUpState extends BasicGameState {
 
 		if (input.isKeyDown(Input.KEY_SPACE))
 		{
-			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-			bg.ball.setVelocity(new Vector(.1f, .2f));
+			//bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+			//bg.ball.setVelocity(new Vector(.1f, .2f));
 			bg.ball.removeBrokenBall();
-			bg.enterState(BounceGame.LEVEL1STATE);	
+			bg.enterState(BounceGame.LEVEL1STATE, new FadeOutTransition(), new FadeInTransition());	
 		}
 			
 		// bounce the ball...
@@ -127,18 +136,18 @@ class StartUpState extends BasicGameState {
 //		}
 		
 		if (bounced) {
-			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
+			//bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
 		}
 		bg.ball.update(delta);
 
 		// check if there are any finished explosions, if so remove them
 		// CAREFUL WITH GETTING CONCURRENT MODIFYING EXCEPTION HERE
 		// HAPPENS WHEN YOU MODIFY THE LIST WHILE YOU'RE TRYING TO WALK IT
-		for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {
-			if (!i.next().isActive()) {
-				i.remove();
-			}
-		}
+//		for (Iterator<Bang> i = bg.explosions.iterator(); i.hasNext();) {
+//			if (!i.next().isActive()) {
+//				i.remove();
+//			}
+//		}
 
 	}
 

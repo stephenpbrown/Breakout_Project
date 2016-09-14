@@ -16,6 +16,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.FadeInTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.HorizontalSplitTransition;
 
 import jig.ResourceManager;
@@ -57,7 +59,7 @@ public class GameWonState extends BasicGameState
 	
 	public void saveHighScore(int highScore) throws IOException
 	{
-		System.out.println("Saving highScore: " + highScore);
+		//System.out.println("Saving highScore: " + highScore);
 		Writer wr = new FileWriter("highScore.txt");
 		wr.write(String.valueOf(highScore));
 		wr.close();
@@ -70,7 +72,7 @@ public class GameWonState extends BasicGameState
 		BounceGame bg = (BounceGame)game;
 		
 		g.drawString("Score: " + lastKnownScore, 10, 30);
-		g.drawString("Highscore: " + lastKnownHighScore, 620, 10);
+		g.drawString("Highscore: " + ((StartUpState)game.getState(BounceGame.STARTUPSTATE)).getUserHighScore(), 620, 10);
 		//g.drawString("Lives Remaining: 0", 10, 50);
 		
 		for (Bang b : bg.explosions)
@@ -84,11 +86,13 @@ public class GameWonState extends BasicGameState
 	public void update(GameContainer container, StateBasedGame game,
 			int delta) throws SlickException {
 		
+		BounceGame bg= (BounceGame)game;
 		
 		timer -= delta;
 		if (timer <= 0)
-			game.enterState(BounceGame.STARTUPSTATE, new EmptyTransition(), new HorizontalSplitTransition() );
-
+		{
+			game.enterState(BounceGame.STARTUPSTATE, new FadeOutTransition(), new FadeInTransition() );
+		}
 		// check if there are any finished explosions, if so remove them
 		for (Iterator<Bang> i = ((BounceGame)game).explosions.iterator(); i.hasNext();) {
 			if (!i.next().isActive()) {

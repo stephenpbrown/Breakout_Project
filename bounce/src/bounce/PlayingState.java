@@ -3,6 +3,7 @@ package bounce;
 import java.io.IOException;
 import java.util.Iterator;
 
+import jig.ResourceManager;
 import jig.Vector;
 
 import org.newdawn.slick.GameContainer;
@@ -40,6 +41,7 @@ class PlayingState extends BasicGameState {
 	int keepScore = 0;
 	int bricksHitInARow = 0;
 	int highScore = 0;
+	boolean pause = false;
 	
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -133,6 +135,8 @@ class PlayingState extends BasicGameState {
 			Graphics g) throws SlickException {
 		BounceGame bg = (BounceGame)game;
 		
+		g.drawImage(ResourceManager.getImage(BounceGame.BACKGROUND_RSC), 0, 0); // Draw background
+		
 		g.drawString("Score: " + keepScore, 10, 30);
 		//g.drawString("Highscore: " + ((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).getUserHighScore(), 620, 10);
 		g.drawString("Highscore: " + ((StartUpState)game.getState(BounceGame.STARTUPSTATE)).getUserHighScore(), 620, 10);
@@ -167,40 +171,43 @@ class PlayingState extends BasicGameState {
 	
 		resetLives = false;
 		
-		// Move the paddle left
-		if (input.isKeyDown(Input.KEY_LEFT) && !(bg.paddle.getCoarseGrainedMinX() < 0-30)) 
+		if(!pause)
 		{
-			bg.paddle.setVelocity(new Vector(-0.55f,0));
+			// Move the paddle left
+			if (input.isKeyDown(Input.KEY_LEFT) && !(bg.paddle.getCoarseGrainedMinX() < 0-30)) 
+			{
+				bg.paddle.setVelocity(new Vector(-0.55f,0));
+			}
+			// Move the paddle right
+			else if (input.isKeyDown(Input.KEY_RIGHT) && !(bg.paddle.getCoarseGrainedMaxX() > bg.ScreenWidth+30)) 
+			{
+				bg.paddle.setVelocity(new Vector(0.55f, 0));
+			}
+			else
+			{
+				bg.paddle.setVelocity(new Vector(0,0));
+			}	
+			bg.paddle.update(delta);
+			
+			if (input.isKeyDown(Input.KEY_UP) && !(bg.paddles.get(0).getCoarseGrainedMinY() < 0))
+			{
+				bg.paddles.get(0).setVelocity(new Vector(0, -0.55f));
+				bg.paddles.get(1).setVelocity(new Vector(0, -0.55f));
+			}
+			else if (input.isKeyDown(Input.KEY_DOWN) && !(bg.paddles.get(0).getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()-5))
+			{
+				bg.paddles.get(0).setVelocity(new Vector(0, 0.55f));
+				bg.paddles.get(1).setVelocity(new Vector(0, 0.55f));
+			}
+			else
+			{
+				bg.paddles.get(0).setVelocity(new Vector(0, 0));
+				bg.paddles.get(1).setVelocity(new Vector(0, 0));
+			}
+			bg.paddles.get(0).update(delta);
+			bg.paddles.get(1).update(delta);
 		}
-		// Move the paddle right
-		else if (input.isKeyDown(Input.KEY_RIGHT) && !(bg.paddle.getCoarseGrainedMaxX() > bg.ScreenWidth+30)) 
-		{
-			bg.paddle.setVelocity(new Vector(0.55f, 0));
-		}
-		else
-		{
-			bg.paddle.setVelocity(new Vector(0,0));
-		}	
-		bg.paddle.update(delta);
 		
-		if (input.isKeyDown(Input.KEY_UP) && !(bg.paddles.get(0).getCoarseGrainedMinY() < 0))
-		{
-			bg.paddles.get(0).setVelocity(new Vector(0, -0.55f));
-			bg.paddles.get(1).setVelocity(new Vector(0, -0.55f));
-		}
-		else if (input.isKeyDown(Input.KEY_DOWN) && !(bg.paddles.get(0).getCoarseGrainedMaxY() > bg.paddle.getCoarseGrainedMinY()-5))
-		{
-			bg.paddles.get(0).setVelocity(new Vector(0, 0.55f));
-			bg.paddles.get(1).setVelocity(new Vector(0, 0.55f));
-		}
-		else
-		{
-			bg.paddles.get(0).setVelocity(new Vector(0, 0));
-			bg.paddles.get(1).setVelocity(new Vector(0, 0));
-		}
-		bg.paddles.get(0).update(delta);
-		bg.paddles.get(1).update(delta);
-
 		// Top right angle
 		double paddleTopRightdY = (bg.paddle.getCoarseGrainedMinY() - bg.ball.getCoarseGrainedHeight()/2)  - bg.paddle.getY();
 		double paddleTopRightdX  = (bg.paddle.getCoarseGrainedMaxX() + bg.ball.getCoarseGrainedWidth()/2) - bg.paddle.getX();
@@ -233,6 +240,7 @@ class PlayingState extends BasicGameState {
 			
 			if(!paddleAlreadyHit)
 			{
+				ResourceManager.getSound(bg.PADDLE_HITSND_RSC).play();
 				paddleAlreadyHit = true;
 				
 				if(ballAngle >= paddleTopRightAngle && ballAngle <= paddleTopLeftAngle) // Top of the paddle
@@ -310,7 +318,7 @@ class PlayingState extends BasicGameState {
 		{
 			if(p.collides(bg.ball) != null)
 			{
-				bricksHitInARow = 0;
+				//bricksHitInARow = 0;
 				// Reference: http://stackoverflow.com/questions/7586063/how-to-calculate-the-angle-between-a-line-and-the-horizontal-axis
 				double deltaY = bg.ball.getY() - p.getY();
 				double deltaX = bg.ball.getX() - p.getX();
@@ -324,6 +332,7 @@ class PlayingState extends BasicGameState {
 				
 				if(lastSidePaddleHit != p)
 				{
+					ResourceManager.getSound(bg.SIDEPADDLE_HITSND_RSC).play();
 					if(ballAngle >= topRightAngle && ballAngle <= topLeftAngle) // Top of the paddle
 					{
 						bg.ball.bounce(0); 
@@ -427,7 +436,7 @@ class PlayingState extends BasicGameState {
 						bg.ball.bounce(90);
 					}
 				}
-				bounced = true;
+				//bounced = true;
 				bounces++;
 				lastBrickHit = b;
 				lastSidePaddleHit = null;
@@ -435,6 +444,9 @@ class PlayingState extends BasicGameState {
 				
 				if(b.getHP() > 0)
 					b.decrementHP(1);
+				
+				//if(b.getHP() > 0)
+				ResourceManager.getSound(bg.BRICK_HITSND_RSC).play();
 				
 				break;	
 			}
@@ -484,166 +496,151 @@ class PlayingState extends BasicGameState {
 		}
 		
 		if (bounced) {
-			bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
+			//bg.explosions.add(new Bang(bg.ball.getX(), bg.ball.getY()));
 			//bounces++;
+		}
+		
+		// Remove bricks when their HP is 0
+		for (Iterator<Bricks> b = bg.brick.iterator(); b.hasNext();)
+		{
+			// System.out.println(b.hasNext()); // DEBUG
+			if(b.next().getHP() == 0)
+			{
+				if(!bg.brick.isEmpty()){
+					//ResourceManager.getSound(bg.BRICK_EXPLOSIONSND_RSC).play();
+					b.remove();
+					bricksRemaining--;
+				}
+			}
+		}
+		//System.out.println(bg.brick.size());
+		// All bricks are gone, game is won!
+		if(bg.brick.isEmpty())
+		{
+			if(level == 1)
+			{
+				game.enterState(BounceGame.LEVEL2STATE, new FadeOutTransition(), new FadeInTransition());
+				level = 2;
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+			}
+			else if(level == 2)
+			{
+				game.enterState(BounceGame.LEVEL3STATE, new FadeOutTransition(), new FadeInTransition());
+				level = 3;
+				paddleAlreadyHit = false;
+				bg.ball.removeBrokenBall();
+			}
+			else if(level == 3)
+			{
+				if(livesRemaining == 1)
+					keepScore += 100;
+				else if(livesRemaining == 2)
+					keepScore += 200;
+				else if(livesRemaining >= 3)
+					keepScore += 300;
+				
+				((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(keepScore);
+				if(keepScore > ((StartUpState)game.getState(BounceGame.STARTUPSTATE)).getUserHighScore())
+				{
+					try {
+						((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).saveHighScore(keepScore);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserHighScore(keepScore);
+				}
+				game.enterState(BounceGame.GAMEWONSTATE, new FadeOutTransition(), new FadeInTransition());
+				keepScore = 0;
+				bricksHitInARow = 0;
+				level = 1;
+				resetLives = true;
+				paddleAlreadyHit = false;
+			}
+		}
+		
+		// Keyboard shortcuts
+		if(input.isKeyDown(Input.KEY_LCONTROL) || input.isKeyDown(Input.KEY_RCONTROL))
+		{
+			if(input.isKeyDown(Input.KEY_1))
+			{
+				level = 1;
+				paddleAlreadyHit = false;
+				game.enterState(BounceGame.LEVEL1STATE, new FadeOutTransition(), new FadeInTransition());
+			}
+			else if(input.isKeyDown(Input.KEY_2))
+			{
+				level = 2;
+				paddleAlreadyHit = false;
+				game.enterState(BounceGame.LEVEL2STATE, new FadeOutTransition(), new FadeInTransition());
+			}
+			else if(input.isKeyDown(Input.KEY_3))
+			{
+				level = 3;
+				paddleAlreadyHit = false;
+				game.enterState(BounceGame.LEVEL3STATE, new FadeOutTransition(), new FadeInTransition());
+			}
+			else if(input.isKeyDown(Input.KEY_4))
+			{
+				// Add bonus to final score depending on number of lives remaining
+				if(livesRemaining == 1)
+					keepScore += 100;
+				else if(livesRemaining == 2)
+					keepScore += 200;
+				else if(livesRemaining >= 3)
+					keepScore += 300;
+				
+				((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(keepScore);
+				if(keepScore > ((StartUpState)game.getState(BounceGame.STARTUPSTATE)).getUserHighScore())
+				{
+					try {
+						((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).saveHighScore(keepScore);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserHighScore(keepScore);
+				}
+				game.enterState(BounceGame.GAMEWONSTATE, new FadeOutTransition(), new FadeInTransition());
+				keepScore = 0;
+				bricksHitInARow = 0;
+				level = 1;
+				resetLives = true;
+				paddleAlreadyHit = false;
+			}
+			else if(input.isKeyDown(Input.KEY_L))
+			{
+				livesRemaining += 1;
+			}
+		}
+		
+		if(input.isKeyDown(Input.KEY_P))
+		{
+			pause = true;
+		}
+		
+		if(input.isKeyDown(Input.KEY_SPACE)
+				)
+		{
+			pause = false;
+		}
+		
+		if(pause)
+		{
+			delta = 0;
 		}
 		
 		if (redrawBall)
 		{
+			ResourceManager.getSound(bg.BALL_DIEDSND_RSC).play();
 			bricksHitInARow = 0;
-			bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-			bg.ball.setVelocity(new Vector(.09f, .19f));
+			if(livesRemaining != 0)
+			{
+				bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
+				bg.ball.setVelocity(new Vector(.09f, .19f));
+			}
 		}
-		
-		// Remove bricks when their HP is 0
-				for (Iterator<Bricks> b = bg.brick.iterator(); b.hasNext();)
-				{
-					// System.out.println(b.hasNext()); // DEBUG
-					if(b.next().getHP() == 0)
-					{
-						if(!bg.brick.isEmpty()){
-							b.remove();
-							bricksRemaining--;
-						}
-					}
-				}
-				//System.out.println(bg.brick.size());
-				// All bricks are gone, game is won!
-				if(bg.brick.isEmpty())
-				{
-					if(level == 1)
-					{
-						game.enterState(BounceGame.LEVEL2STATE);
-						level = 2;
-						bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-						bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-						bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-						bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-						bg.ball.setVelocity(new Vector(.09f, .19f));
-						paddleAlreadyHit = false;
-						bg.ball.removeBrokenBall();
-					}
-					else if(level == 2)
-					{
-						game.enterState(BounceGame.LEVEL3STATE);
-						level = 3;
-						bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-						bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-						bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-						bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-						bg.ball.setVelocity(new Vector(.09f, .19f));
-						paddleAlreadyHit = false;
-						bg.ball.removeBrokenBall();
-					}
-					else if(level == 3)
-					{
-						if(livesRemaining == 1)
-							keepScore += 100;
-						else if(livesRemaining == 2)
-							keepScore += 200;
-						else if(livesRemaining >= 3)
-							keepScore += 300;
-						
-						((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(keepScore);
-						if(keepScore > ((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).getUserHighScore())
-						{
-							try {
-								((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).saveHighScore(keepScore);
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserHighScore(keepScore);
-						}
-						game.enterState(BounceGame.GAMEWONSTATE);
-						keepScore = 0;
-						bricksHitInARow = 0;
-						level = 1;
-						resetLives = true;
-						bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-						bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-						bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-						paddleAlreadyHit = false;
-						bg.ball.removeBrokenBall();
-					}
-				}
-				
-				// Keyboard shortcuts
-				if(input.isKeyDown(Input.KEY_LCONTROL) || input.isKeyDown(Input.KEY_RCONTROL))
-				{
-					if(input.isKeyDown(Input.KEY_1))
-					{
-						level = 1;
-						bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-						bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-						bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-						bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-						bg.ball.setVelocity(new Vector(.09f, .19f));
-						paddleAlreadyHit = false;
-						bg.ball.removeBrokenBall();
-						game.enterState(BounceGame.LEVEL1STATE);
-					}
-					else if(input.isKeyDown(Input.KEY_2))
-					{
-						level = 2;
-						bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-						bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-						bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-						bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-						bg.ball.setVelocity(new Vector(.09f, .19f));
-						paddleAlreadyHit = false;
-						bg.ball.removeBrokenBall();
-						game.enterState(BounceGame.LEVEL2STATE);
-					}
-					else if(input.isKeyDown(Input.KEY_3))
-					{
-						level = 3;
-						bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-						bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-						bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-						bg.ball.setPosition(bg.ScreenWidth / 4, bg.ScreenHeight / 2);
-						bg.ball.setVelocity(new Vector(.09f, .19f));
-						paddleAlreadyHit = false;
-						bg.ball.removeBrokenBall();
-						game.enterState(BounceGame.LEVEL3STATE);
-					}
-					else if(input.isKeyDown(Input.KEY_4))
-					{
-						// Add bonus to final score depending on number of lives remaining
-						if(livesRemaining == 1)
-							keepScore += 100;
-						else if(livesRemaining == 2)
-							keepScore += 200;
-						else if(livesRemaining >= 3)
-							keepScore += 300;
-						
-						((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserScore(keepScore);
-						if(keepScore > ((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).getUserHighScore())
-						{
-							try {
-								((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).saveHighScore(keepScore);
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							((GameWonState)game.getState(BounceGame.GAMEWONSTATE)).setUserHighScore(keepScore);
-						}
-						game.enterState(BounceGame.GAMEWONSTATE);
-						keepScore = 0;
-						bricksHitInARow = 0;
-						level = 1;
-						resetLives = true;
-						bg.paddles.get(0).setPosition(16, bg.ScreenHeight-110);
-						bg.paddles.get(1).setPosition(bg.ScreenWidth-16, bg.ScreenHeight-110);
-						bg.paddle.setPosition(bg.ScreenWidth/2, bg.ScreenHeight-16);
-						paddleAlreadyHit = false;
-						bg.ball.removeBrokenBall();
-					}
-					else if(input.isKeyDown(Input.KEY_L))
-					{
-						livesRemaining += 1;
-					}
-				}
 				
 		bg.ball.update(delta);
 
@@ -656,7 +653,7 @@ class PlayingState extends BasicGameState {
 
 		if (livesRemaining == 0) {
 			((GameOverState)game.getState(BounceGame.GAMEOVERSTATE)).setUserScore(keepScore);
-			game.enterState(BounceGame.GAMEOVERSTATE);
+			game.enterState(BounceGame.GAMEOVERSTATE, new FadeOutTransition(), new FadeInTransition());
 			resetLives = true;
 			level = 1; 
 			bricksHitInARow = 0;

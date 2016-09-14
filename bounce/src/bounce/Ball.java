@@ -40,9 +40,9 @@ import jig.Vector;
 	 * @param surfaceTangent
 	 */
 	public void bounce(float surfaceTangent) {
-		removeImage(ResourceManager.getImage(BounceGame.BALL_EARTH_RSC));
-		addImageWithBoundingBox(ResourceManager
-				.getImage(BounceGame.BALL_EARTH_DESTROYED_RSC)); 
+		//removeImage(ResourceManager.getImage(BounceGame.BALL_EARTH_RSC));
+//		addImageWithBoundingBox(ResourceManager
+//				.getImage(BounceGame.BALL_EARTH_DESTROYED_RSC)); 
 		countdown = 500; // Milliseconds
 		velocity = velocity.bounce(surfaceTangent);
 	}
